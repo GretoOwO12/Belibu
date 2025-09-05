@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Mágico para Belibu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            font-family: 'Arial', sans-serif;
+            cursor: none;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #fff, #ff6b6b);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 182, 193, 0.8);
+            animation: floatUp 4s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: clamp(2em, 5vw, 3em);
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); text-shadow: 3px 3px 6px rgba(0,0,0,0.5); }
+            50% { transform: scale(1.05); text-shadow: 5px 5px 15px rgba(255,255,255,0.8); }
+        }
+
+        .envelope {
+            width: min(250px, 80vw);
+            height: min(180px, 60vw);
+            margin: 0 auto 30px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(0 15px 35px rgba(0,0,0,0.4));
+            transform-style: preserve-3d;
+        }
+
+        .envelope:hover {
+            transform: scale(1.1) rotateY(5deg) rotateX(5deg);
+            filter: drop-shadow(0 20px 40px rgba(255,107,107,0.6));
+        }
+
+        .envelope.mega-bounce {
+            animation: megaBounce 1s ease-out;
+        }
+
+        .envelope.spin {
+            animation: spin360 1s ease-out;
+        }
+
+        .envelope.grow {
+            animation: growShrink 0.8s ease-out;
+        }
+
+        .envelope.rainbow {
+            animation: rainbowGlow 0.6s ease-out;
+        }
+
+        @keyframes megaBounce {
+            0% { transform: scale(1) translateY(0); }
+            30% { transform: scale(1.3) translateY(-50px) rotateZ(10deg); }
+            60% { transform: scale(0.9) translateY(20px) rotateZ(-5deg); }
+            100% { transform: scale(1) translateY(0) rotateZ(0deg); }
+        }
+
+        @keyframes spin360 {
+            0% { transform: rotateY(0deg) rotateX(0deg); }
+            100% { transform: rotateY(720deg) rotateX(360deg); }
+        }
+
+        @keyframes growShrink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5) rotateZ(180deg); }
+        }
+
+        @keyframes rainbowGlow {
+            0% { filter: hue-rotate(0deg) brightness(1) saturate(1); }
+            25% { filter: hue-rotate(90deg) brightness(1.5) saturate(2); }
+            50% { filter: hue-rotate(180deg) brightness(2) saturate(3); }
+            75% { filter: hue-rotate(270deg) brightness(1.5) saturate(2); }
+            100% { filter: hue-rotate(360deg) brightness(1) saturate(1); }
+        }
+
+        .envelope-body {
+            width: 100%;
+            height: 75%;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e, #e17055);
+            border: 4px solid #d63031;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .envelope-body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .envelope-flap {
+            width: 0;
+            height: 0;
+            border-left: 50% solid transparent;
+            border-right: 50% solid transparent;
+            border-top: 33% solid #d63031;
+            position: absolute;
+            top: -30%;
+            left: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center bottom;
+        }
+
+        .envelope.opening .envelope-flap {
+            transform: rotateX(-180deg);
+            border-top-color: #e84393;
+        }
+
+        .magic-sparkles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 1.5s ease-out infinite;
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .click-counter {
+            color: white;
+            font-size: clamp(1.5em, 4vw, 2em);
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: counterGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes counterGlow {
+            0% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            100% { text-shadow: 0 0 20px rgba(255,255,255,0.8), 2px 2px 4px rgba(0,0,0,0.5); }
+        }
+
+        .progress-container {
+            width: min(400px, 90vw);
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9, #74b9ff, #a29bfe);
+            background-size: 300% 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+            animation: progressFlow 2s linear infinite;
+            position: relative;
+        }
+
+        @keyframes progressFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 0%; }
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: progressShine 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .instruction {
+            color: white;
+            font-size: clamp(1.2em, 3vw, 1.5em);
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            animation: instructionFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes instructionFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .click-effect {
+            position: fixed;
+            border: 2px solid white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: clickRipple 0.6s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes clickRipple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
+            animation: messageBackground 2s ease infinite;
+            color: white;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: clamp(1em, 3vw, 1.6em);
+            font-weight: bold;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        @keyframes messageBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .message.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .message-content {
+            font-size: 0.9em;
+            color: #fff3cd;
+            line-height: 1.8;
+            text-align: left;
+            max-width: 100%;
+            margin: 20px 0;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: clamp(1em, 2.5vw, 1.2em);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            background: linear-gradient(45deg, #ff9a56, #ff6b9d);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: right 0.5s ease;
+            z-index: 1001;
+            font-size: clamp(0.9em, 2.5vw, 1em);
+            max-width: 280px;
+        }
+
+        .achievement-popup.show {
+            right: 20px;
+        }
+
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: clamp(1em, 3vw, 1.2em);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1001;
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .question-container {
+            font-size: clamp(1.4em, 4vw, 1.8em);
+            margin-bottom: 20px;
+            color: #fff3cd;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .choice-btn {
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: clamp(1em, 2.5vw, 1.2em);
+        }
+
+        .btn-si {
+            background: linear-gradient(45deg, #e84393, #fd79a8);
+            color: white;
+        }
+
+        .btn-no {
+            background: linear-gradient(45deg, #fd79a8, #e84393);
+            color: white;
+            position: absolute;
+            z-index: 1001;
+            width: 80px;
+            height: 40px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50px;
+        }
+
+        .youtube-audio {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border: 0;
+            pointer-events: none;
+        }
+
+        /* Media queries para pantallas muy pequeñas */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .message {
+                padding: 20px;
+                font-size: 1em;
+            }
+
+            .message-content {
+                font-size: 0.85em;
+            }
+
+            .envelope {
+                width: min(200px, 75vw);
+                height: min(140px, 55vw);
+            }
+        }
+
+        /* Media queries para pantallas muy grandes */
+        @media (min-width: 1920px) {
+            .envelope {
+                width: 300px;
+                height: 220px;
+            }
+        }
+
+        /* Ajustes para pantallas en modo landscape en móviles */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                min-height: auto;
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 2em;
+                margin-bottom: 10px;
+            }
+
+            .envelope {
+                width: min(180px, 25vw);
+                height: min(120px, 20vw);
+                margin-bottom: 15px;
+            }
+
+            .instruction {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+
+            .click-counter {
+                font-size: 1.3em;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- REPRODUCTOR DE YOUTUBE OCULTO -->
+    <iframe 
+        class="youtube-audio" 
+        id="youtubePlayer" 
+        src="https://www.youtube.com/embed/nQVaRFP-ppw?autoplay=1&loop=1&playlist=nQVaRFP-ppw&controls=0&showinfo=0&rel=0&modestbranding=1&start=0" 
+        frameborder="0" 
+        allow="autoplay; loop; encrypted-media" 
+        allowfullscreen>
+    </iframe>
+
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="floating-hearts" id="floatingHearts"></div>
+    <div class="magic-sparkles" id="sparkles"></div>
+    
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊</button>
+    
+    <div class="container">
+        <h1 class="title">✨ SOBRE MÁGICO ✨</h1>
+        <div class="click-counter">Clics: <span id="clickCount">0</span>/50</div>
+        <div class="instruction">¡Haz clic en el sobre para leer tu carta especial!</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="envelope" id="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-body"></div>
+        </div>
+    </div>
+
+    <div class="achievement-popup" id="achievementPopup">
+        🏆 ¡Logro desbloqueado!
+    </div>
+
+    <!-- PRIMERA PANTALLA: MENSAJE ORIGINAL -->
+    <div class="message" id="message">
+        <h2>Para Belibu</h2>
+        <div class="message-content">
+            Hello, Belibu<br><br>
+            Sé que estás cansadita… y justo por eso quería decirte esto. Te aprecio demasiado, de verdad. Gracias por escucharme ayer… y gracias, sobre todo, por ser como sos.<br><br>
+            Me quedé pensando en vos: te levantás temprano, para trabajar. Eso no es fácil, y vos lo haces con una fuerza tranquila que me impresiona. La verdad ayer sude frio si me dijistes que me hechabas la culpa sino te levantabas. La verdad, la pase algo bonito esa noche y mas que conozco por primera vez una cristina<br><br>
+            Solo quería que supieras que sí te veo.
+        </div>
+        <button class="reset-btn" onclick="showQuestion()">
+            Siguiente
+        </button>
+    </div>
+
+    <!-- SEGUNDA PANTALLA: ¿ME QUIERES? -->
+    <div class="message" id="questionMessage">
+        <div class="question-container">
+            <h2>¿Me quieres?</h2>
+            <p>No mientas...</p>
+            <p>Dime la verdad</p>
+        </div>
+        <button class="choice-btn btn-si" onclick="showFinalMessage()">Sí</button>
+        <button class="choice-btn btn-no" id="btnNo">No</button>
+    </div>
+
+    <!-- TERCERA PANTALLA: RESPUESTA FINAL -->
+    <div class="message" id="finalMessage">
+        <h2>Ya lo sabía 💖</h2>
+        <div class="message-content" style="text-align: center; font-size: 1.2em;">
+            Sabía que ibas a decir que sí…<br>
+            Porque yo también te quiero, Belibu.
+        </div>
+        <button class="reset-btn" onclick="resetGame()">
+            Regresar al inicio
+        </button>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        const maxClicks = 50;
+        let soundEnabled = true;
+        const envelope = document.getElementById('envelope');
+        const clickCountDisplay = document.getElementById('clickCount');
+        const message = document.getElementById('message');
+        const questionMessage = document.getElementById('questionMessage');
+        const finalMessage = document.getElementById('finalMessage');
+        const progressFill = document.getElementById('progressFill');
+        const achievementPopup = document.getElementById('achievementPopup');
+        const cursor = document.getElementById('cursor');
+        const btnNo = document.getElementById('btnNo');
+
+        // Reproductor de YouTube
+        const youtubePlayer = document.getElementById('youtubePlayer');
+
+        const cursorTrails = [];
+        const maxTrails = 20;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(frequency, duration, type = 'sine') {
+            if (!soundEnabled) return;
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundIcon = document.getElementById('soundToggle');
+            const youtubeFrame = document.getElementById('youtubePlayer');
+            
+            if (soundEnabled) {
+                soundIcon.textContent = '🔊';
+                // Recargar el iframe para reactivar el audio
+                youtubeFrame.src = youtubeFrame.src;
+            } else {
+                soundIcon.textContent = '🔇';
+                // Pausar YouTube cambiando a una URL sin autoplay
+                youtubeFrame.src = 'https://www.youtube.com/embed/KwZfzu73wh4?autoplay=0&loop=1&playlist=KwZfzu73wh4&controls=0&showinfo=0&rel=0&modestbranding=1&start=0';
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+            
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = e.clientX - 3 + 'px';
+            trail.style.top = e.clientY - 3 + 'px';
+            document.body.appendChild(trail);
+            
+            cursorTrails.push(trail);
+            
+            if (cursorTrails.length > maxTrails) {
+                const oldTrail = cursorTrails.shift();
+                oldTrail.remove();
+            }
+            
+            setTimeout(() => {
+                if (trail.parentNode) {
+                    trail.style.opacity = '0';
+                    trail.style.transform = 'scale(0)';
+                    setTimeout(() => trail.remove(), 200);
+                }
+            }, 100);
+        });
+
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = ['💖', '💕', '💝', '🌟', '✨', '💫'][Math.floor(Math.random() * 6)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+            heart.style.fontSize = (15 + Math.random() * 10) + 'px';
+            
+            document.getElementById('floatingHearts').appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 4000);
+        }
+
+        function createSparkles() {
+            const sparklesContainer = document.getElementById('sparkles');
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 0.5 + 's';
+                    sparklesContainer.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 1500);
+                }, i * 100);
+            }
+        }
+
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = (x - 100) + 'px';
+            effect.style.top = (y - 100) + 'px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 600);
+        }
+
+        function createParticleExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = color;
+                particle.style.width = (3 + Math.random() * 5) + 'px';
+                particle.style.height = particle.style.width;
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const velocity = 100 + Math.random() * 100;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particle.style.position = 'fixed';
+                document.body.appendChild(particle);
+                
+                let posX = x;
+                let posY = y;
+                let opacity = 1;
+                
+                const animateParticle = () => {
+                    posX += vx * 0.02;
+                    posY += vy * 0.02 + 2;
+                    opacity -= 0.02;
+                    
+                    particle.style.left = posX + 'px';
+                    particle.style.top = posY + 'px';
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animateParticle);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animateParticle);
+            }
+        }
+
+        function createFireworks() {
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight * 0.6;
+                    const colors = ['#ff6b6b', '#4ecdc4', '#feca57', '#ff9ff3', '#6c5ce7', '#a29bfe'];
+                    
+                    createParticleExplosion(x, y, colors[Math.floor(Math.random() * colors.length)]);
+                    
+                    playSound(800 + Math.random() * 400, 0.3, 'sawtooth');
+                }, i * 200);
+            }
+        }
+
+        function showAchievement(text) {
+            achievementPopup.textContent = '🏆 ' + text;
+            achievementPopup.classList.add('show');
+            
+            setTimeout(() => {
+                achievementPopup.classList.remove('show');
+            }, 3000);
+        }
+
+        function getRandomAnimation() {
+            const animations = ['mega-bounce', 'spin', 'grow', 'rainbow'];
+            return animations[Math.floor(Math.random() * animations.length)];
+        }
+
+        envelope.addEventListener('click', function(e) {
+            if (clickCount < maxClicks) {
+                clickCount++;
+                clickCountDisplay.textContent = clickCount;
+                
+                playSound(200 + clickCount * 40, 0.2);
+                
+                const rect = envelope.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                createClickEffect(e.clientX, e.clientY);
+                createParticleExplosion(centerX, centerY, `hsl(${clickCount * 18}, 70%, 60%)`);
+                createSparkles();
+                
+                const progress = (clickCount / maxClicks) * 100;
+                progressFill.style.width = progress + '%';
+                
+                envelope.classList.add('opening');
+                const animation = getRandomAnimation();
+                envelope.classList.add(animation);
+                
+                setTimeout(() => {
+                    envelope.classList.remove(animation);
+                }, 1000);
+                
+                envelope.style.filter = `hue-rotate(${clickCount * 18}deg) brightness(${1 + clickCount * 0.05}) saturate(${1 + clickCount * 0.1})`;
+                
+                if (clickCount === 10) showAchievement('¡10 clics! 🎉');
+                if (clickCount === 25) showAchievement('¡A mitad de camino! 💪');
+                if (clickCount === 40) showAchievement('¡Casi lo logras! 💖');
+                
+                if (clickCount === maxClicks) {
+                    setTimeout(() => {
+                        message.classList.add('show');
+                        createFireworks();
+                        showAchievement('¡MISIÓN COMPLETADA! 🎊');
+                    }, 1000);
+                }
+            }
+        });
+
+        function showQuestion() {
+            message.classList.remove('show');
+            questionMessage.classList.add('show');
+            positionNoButton();
+        }
+
+        function positionNoButton() {
+            const maxX = window.innerWidth - 100;
+            const maxY = window.innerHeight - 100;
+            const x = Math.random() * maxX + 50;
+            const y = Math.random() * maxY + 50;
+            btnNo.style.left = x + 'px';
+            btnNo.style.top = y + 'px';
+        }
+
+        document.addEventListener('mousemove', () => {
+            const rect = btnNo.getBoundingClientRect();
+            const cursorRect = cursor.getBoundingClientRect();
+            
+            const distX = Math.abs(cursorRect.left - rect.left);
+            const distY = Math.abs(cursorRect.top - rect.top);
+            
+            if (distX < 100 && distY < 80) {
+                positionNoButton();
+                playSound(300, 0.1);
+            }
+        });
+
+        function showFinalMessage() {
+            questionMessage.classList.remove('show');
+            finalMessage.classList.add('show');
+            createFireworks();
+            showAchievement('¡Amor confirmado! 💖');
+        }
+
+        function resetGame() {
+            clickCount = 0;
+            clickCountDisplay.textContent = '0';
+            progressFill.style.width = '0%';
+            message.classList.remove('show');
+            questionMessage.classList.remove('show');
+            finalMessage.classList.remove('show');
+            envelope.classList.remove('opening');
+            envelope.style.filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.4))';
+            
+            // Resetear el botón "No" a su estado original
+            btnNo.classList.remove('moving');
+            btnNo.style.left = '';
+            btnNo.style.top = '';
+            hasMovedNo = false;
+            
+            playSound(300, 0.5);
+        }
+
+        // Inicializar cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', function() {
+            setupBackgroundMusic();
+            // Intentar iniciar música automáticamente (puede fallar por políticas del navegador)
+            setTimeout(startBackgroundMusic, 1000);
+        });
+
+        // Inicializar también cuando la ventana esté completamente cargada
+        window.addEventListener('load', function() {
+            setupBackgroundMusic();
+        });
+
+        setInterval(createFloatingHeart, 2000);
+        setInterval(createSparkles, 3000);
+
+        envelope.addEventListener('mouseenter', () => {
+            playSound(400, 0.1);
+            cursor.style.transform = 'scale(1.5)';
+        });
+
+        envelope.addEventListener('mouseleave', () => {
+            cursor.style.transform = 'scale(1)';
+        });
+
+        // Inicializar efectos
+        createSparkles();
+
+        // Mejorar la responsividad en dispositivos táctiles
+        if ('ontouchstart' in window) {
+            document.body.style.cursor = 'default';
+            cursor.style.display = 'none';
+        }
+
+        // Evitar zoom en dispositivos móviles
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, {passive: false});
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
